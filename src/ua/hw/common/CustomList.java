@@ -70,7 +70,12 @@ public class CustomList<T> implements Collection<T> {
         return new CustomIterator<T>();
     }
 
-    private class CustomIterator<E> implements Iterator<E>{
+    public ListIterator<T> listIterator() {
+        return new CustomIterator<T>();
+    }
+
+
+    private class CustomIterator<E> implements Iterator<E>, ListIterator<E>{
         int cursor;       // index of next element to return
         int lastRet = -1; // index of last element returned; -1 if no such
 
@@ -87,6 +92,51 @@ public class CustomList<T> implements Collection<T> {
                 throw new ConcurrentModificationException();
             cursor = i + 1;
             return (E) innerList.get(lastRet = i);
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return false;
+        }
+
+        @Override
+        public E previous() {
+            int i = cursor - 1;
+            if (i >= size())
+                throw new NoSuchElementException();
+            if (i >= innerList.size())
+                throw new ConcurrentModificationException();
+            cursor = i;
+            return (E) innerList.get(lastRet = i);
+        }
+
+        @Override
+        public int nextIndex() {
+            return cursor + 1;
+        }
+
+        @Override
+        public int previousIndex() {
+            return cursor - 1;
+        }
+
+        @Override
+        public void remove() {
+            if (lastRet == -1) {
+                throw new IllegalStateException();
+            }
+            innerList.remove(lastRet);
+            lastRet = -1;
+        }
+
+        @Override
+        public void set(E e) {
+            throw new UnsupportedOperationException("set");
+        }
+
+        @Override
+        public void add(E e) {
+            throw new UnsupportedOperationException("add");
         }
     }
 }
